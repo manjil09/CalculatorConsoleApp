@@ -7,9 +7,18 @@ while (true)
     if (expresstion.ToLower() == "q")
         break;
 
-    double result = evaluateExpression(expresstion);
-
-    Console.WriteLine($"Result: {result}");
+    try
+    {
+        double result = evaluateExpression(expresstion);
+        Console.WriteLine($"\nResult: {result}\n");
+    }
+    catch (ArgumentException e)
+    {
+        Console.WriteLine(e.Message);
+    }
+    catch (InvalidOperationException){ 
+        Console.WriteLine("\nPlease enter a valid expression.\n");
+    }
 }
 
 double evaluateExpression(string expression)
@@ -81,8 +90,8 @@ double performOperation(char @operator, double num1, double num2)
 }
 bool isOperator(char @operator)
 {
-    if( @operator is '+' or '-' or '*' or '/' or '(' or ')')
+    if (@operator is '+' or '-' or '*' or '/' or '(' or ')')
         return true;
     else
-        return false;
+        throw new ArgumentException("\nIvalid operator.\n");
 }
