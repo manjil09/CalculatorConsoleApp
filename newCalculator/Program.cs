@@ -16,15 +16,16 @@ while (true)
     {
         Console.WriteLine(e.Message);
     }
-    catch (InvalidOperationException){ 
+    catch (InvalidOperationException)
+    {
         Console.WriteLine("\nPlease enter a valid expression.\n");
     }
 }
 
 double evaluateExpression(string expression)
 {
-    Stack<double> operandStack = new Stack<double>();
-    Stack<char> operatorStack = new Stack<char>();
+    Stack<double> operandStack = new();
+    Stack<char> operatorStack = new();
 
     for (int i = 0; i < expression.Length; i++)
     {
@@ -41,15 +42,24 @@ double evaluateExpression(string expression)
             operandStack.Push(double.Parse(operand));
         }
         else if (currentChar == '(')
+        {
+            if (i == 0 || !isOperator(expression[i - 1]))
+                throw new InvalidOperationException();
+
             operatorStack.Push(currentChar);
+        }
         else if (currentChar == ')')
         {
+            if (i >= expression.Length - 1 || !isOperator(expression[i + 1]))
+                throw new InvalidOperationException();
+
             while (operatorStack.Count > 0 && getPriority(currentChar) <= getPriority(operatorStack.Peek()) && operatorStack.Peek() != '(')
             {
                 double value = performOperation(operatorStack.Pop(), operandStack.Pop(), operandStack.Pop());
                 operandStack.Push(value);
             }
             operatorStack.Pop();
+
         }
         else if (isOperator(currentChar))
         {
@@ -77,19 +87,18 @@ int getPriority(char @operator)
         _ => 0
     };
 }
-double performOperation(char @operator, double num1, double num2)
+double performOperation(char @operator, double num1, double num2) => @operator switch
 {
-    return @operator switch
-    {
-        '+' => num2 + num1,
-        '-' => num2 - num1,
-        '*' => num2 * num1,
-        '/' => num2 / num1,
-        _ => 0,
-    };
-}
+    '+' => num2 + num1,
+    '-' => num2 - num1,
+    '*' => num2 * num1,
+    '/' => num2 / num1,
+    _ => 0,
+};
 bool isOperator(char @operator)
 {
+    if (char.IsDigit(@operator))
+        return false;
     if (@operator is '+' or '-' or '*' or '/' or '(' or ')')
         return true;
     else
