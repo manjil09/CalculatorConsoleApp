@@ -32,7 +32,7 @@ double evaluateExpression(string expression)
         }
         if (isOperator(currentChar))
         {
-            while (operatorStack.Count > 0)
+            while (operatorStack.Count > 0 && getPriority(currentChar) <= getPriority(operatorStack.Peek()))
             {
                 double value = performOperation(operatorStack.Pop(), operandStack.Pop(), operandStack.Pop());
                 operandStack.Push(value);
@@ -47,7 +47,15 @@ double evaluateExpression(string expression)
     }
     return operandStack.Pop();
 }
-
+int getPriority(char @operator)
+{
+    return @operator switch
+    {
+        '+' or '-' => 1,
+        '*' or '/' => 2,
+        _ => 0
+    };
+}
 double performOperation(char @operator, double num1, double num2)
 {
     return @operator switch
