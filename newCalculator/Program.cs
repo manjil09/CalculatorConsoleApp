@@ -6,6 +6,7 @@ while (true)
 
     if (expresstion.ToLower() == "q")
         break;
+
     double result = evaluateExpression(expresstion);
 
     Console.WriteLine($"Result: {result}");
@@ -23,14 +24,25 @@ double evaluateExpression(string expression)
         if (char.IsDigit(currentChar) || currentChar == '.')
         {
             string operand = currentChar.ToString();
-            while (i<expression.Length-1 && (char.IsDigit(expression[i+1]) || expression[i + 1] == '.'))
+            while (i < expression.Length - 1 && (char.IsDigit(expression[i + 1]) || expression[i + 1] == '.'))
             {
-                operand += expression[i+1];
+                operand += expression[i + 1];
                 i++;
             }
             operandStack.Push(double.Parse(operand));
         }
-        if (isOperator(currentChar))
+        else if (currentChar == '(')
+            operatorStack.Push(currentChar);
+        else if (currentChar == ')')
+        {
+            while (operatorStack.Count > 0 && getPriority(currentChar) <= getPriority(operatorStack.Peek()) && operatorStack.Peek() != '(')
+            {
+                double value = performOperation(operatorStack.Pop(), operandStack.Pop(), operandStack.Pop());
+                operandStack.Push(value);
+            }
+            operatorStack.Pop();
+        }
+        else if (isOperator(currentChar))
         {
             while (operatorStack.Count > 0 && getPriority(currentChar) <= getPriority(operatorStack.Peek()))
             {
@@ -69,5 +81,8 @@ double performOperation(char @operator, double num1, double num2)
 }
 bool isOperator(char @operator)
 {
-    return @operator is '+' or '-' or '*' or '/';
+    if( @operator is '+' or '-' or '*' or '/' or '(' or ')')
+        return true;
+    else
+        return false;
 }
